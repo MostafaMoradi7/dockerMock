@@ -276,3 +276,9 @@ pyvenv.cfg
 pip-selfcheck.json
 
 # End of https://www.toptal.com/developers/gitignore/api/virtualenv,python,django
+
+
+pyproject.toml 
+.flake8
+.vscode
+migrations
