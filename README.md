@@ -33,7 +33,7 @@ Follow these steps to set up and run the DockerMock project locally:
 1. Clone the repository to your local machine:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/MostafaMoradi7/dockerMock.git
    cd DockerMock
    ```
 
