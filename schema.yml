@@ -1,0 +1,429 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/apps/:
+    post:
+      operationId: apps_create
+      tags:
+      - apps
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DockerContainer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DockerContainer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DockerContainer'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DockerContainer'
+          description: ''
+  /api/apps/{container_id}/:
+    get:
+      operationId: apps_retrieve
+      parameters:
+      - in: path
+        name: container_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - apps
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DockerContainer'
+          description: ''
+    delete:
+      operationId: apps_destroy
+      parameters:
+      - in: path
+        name: container_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - apps
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DockerContainer'
+          description: ''
+  /api/apps/{container_id}/logs/:
+    get:
+      operationId: apps_logs_retrieve
+      parameters:
+      - in: path
+        name: container_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - apps
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/apps/{container_id}/start/:
+    patch:
+      operationId: apps_start_partial_update
+      parameters:
+      - in: path
+        name: container_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - apps
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/apps/{container_id}/stop/:
+    patch:
+      operationId: apps_stop_partial_update
+      parameters:
+      - in: path
+        name: container_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - apps
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/apps/list/:
+    get:
+      operationId: apps_list_list
+      tags:
+      - apps
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DockerContainer'
+          description: ''
+  /api/history/:
+    get:
+      operationId: history_list
+      tags:
+      - history
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContainerHistory'
+          description: ''
+  /api/history/{id}/:
+    get:
+      operationId: history_list_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this container history model.
+        required: true
+      tags:
+      - history
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContainerHistory'
+          description: ''
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    ContainerHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        envs:
+          type: object
+          additionalProperties: {}
+        command:
+          type: string
+          maxLength: 300
+        description:
+          type: string
+          nullable: true
+        action_date:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        container:
+          type: string
+      required:
+      - action_date
+      - command
+      - container
+      - envs
+      - id
+    DockerContainer:
+      type: object
+      properties:
+        container_id:
+          type: string
+          maxLength: 150
+        name:
+          type: string
+          maxLength: 100
+        image_address:
+          type: string
+          maxLength: 200
+        envs:
+          type: object
+          additionalProperties: {}
+        command:
+          type: string
+          maxLength: 300
+      required:
+      - command
+      - container_id
+      - envs
+      - image_address
+      - name
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+          maxLength: 200
+      required:
+      - message
+    StatusEnum:
+      enum:
+      - RUNNING
+      - FINISHED
+      - CREATED
+      type: string
+      description: |-
+        * `RUNNING` - running
+        * `FINISHED` - finished
+        * `CREATED` - created
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
