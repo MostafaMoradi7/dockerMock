@@ -118,7 +118,7 @@ class ContainerStopView(APIView):
 
                 ContainerHistoryModel.objects.create(
                     container=container,
-                    action="FINISHED",
+                    status="FINISHED",
                     envs=envs,
                     command=command,
                 )
