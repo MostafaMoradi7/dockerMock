@@ -69,22 +69,22 @@ Follow these steps to set up and run the DockerMock project locally:
 To use the DockerMock API, you can send JSON data to the server to create and manage Docker containers. Here's an example of creating a container:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"name": "new-container", "image_address": "nginx:latest", "envs": {"key1": "value1"}, "command": "sleep 1000"}' http://localhost:8000/apps/
+curl -X POST -H "Content-Type: application/json" -d '{"name": "new-container", "image_address": "hub.hamdocker.ir/nginx:1:21", "envs": {"key1": "value1"}, "command": "sleep 1000"}' http://localhost:8000/apps/
 ```
 
 For detailed API documentation and endpoints, please refer to the [API Endpoints](#api-endpoints) section below.
 
 ## API Endpoints
 
-- `/apps/` (POST): Create a new Docker container.
-- `/apps/list/` (GET): List all created Docker containers.
-- `/apps/<container_id>/` (GET, DELETE): Retrieve or delete a specific container.
-- `/apps/<container_id>/stop/` (PATCH): Stop a running container.
-- `/apps/<container_id>/start/` (PATCH): Start a stopped container.
-- `/apps/<container_id>/logs/` (GET): Retrieve container logs.
-- `/history/` (GET): List all historical actions.
+- `/api/apps/` (GET): Get a list of created containers.
+- `/api/apps/` (POST): Post a json to the server and create a docker container.
+- `/api/apps/<container_id>/` (GET): Retrieve a specific container.
+- `/api/apps/<container_id>/` (PUT): Update a specific container (NAME must change).
+- `/api/apps/<container_id>/` (PATCH): STOP or RUN a specific container.
+- `/api/apps/<container_id>/` (DELETE): Delete a specific container.
+- `/api/history/` (GET): List all historical actions.
 
-For more details on request and response formats, refer to the Swagger documentation.
+For more details on request and response formats, refer to the spectaculare documentation in which is available through the api endpoints of the project.
 
 ## Contributing
 
