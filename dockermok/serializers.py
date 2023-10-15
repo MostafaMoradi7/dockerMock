@@ -9,7 +9,7 @@ class DockerContainerSerializer(ModelSerializer):
         model = DockerContainerModel
         fields = ("container_id", "name", "image_address", "envs", "command")
 
-    def _create_command_for_docker(self, validated_data):
+    def create_command_for_docker(self, validated_data):
         command = "docker create "
         envs = validated_data["envs"]
         for k, v in envs.items():
@@ -27,7 +27,7 @@ class DockerContainerSerializer(ModelSerializer):
         return command
 
     def create(self, validated_data):
-        validated_data["command"] = self._create_command_for_docker(
+        validated_data["command"] = self.create_command_for_docker(
             validated_data=validated_data
         )
         return super().create(validated_data)

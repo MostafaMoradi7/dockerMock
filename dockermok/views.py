@@ -76,27 +76,45 @@ class DockerContainerViewSet(viewsets.ModelViewSet):
         container = get_object_or_404(self.queryset, pk=pk)
         client = docker.from_env()
         container_obj = client.containers.get(container.container_id)
+        print("---------------------------------------------------")
+        try:
+            if container_obj.status != "running":
+                print("I am NOT running")
+                container_obj.start()
+                envs = container_obj.attrs["Config"]["Env"]
+                command = container_obj.attrs["Config"]["Cmd"]
 
-        if container_obj.status != "running":
-            container_obj.start()
-            envs = container_obj.attrs["Config"]["Env"]
-            command = container_obj.attrs["Config"]["Cmd"]
+                ContainerHistoryModel.objects.create(
+                    container=container,
+                    status="STARTED",
+                    envs=envs,
+                    command=command,
+                )
+                client.close()
+                return Response(
+                    {"message": "Container started successfully"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                print("I am Running!")
+                container_obj.stop()
+                envs = container_obj.attrs["Config"]["Env"]
+                command = container_obj.attrs["Config"]["Cmd"]
 
-            ContainerHistoryModel.objects.create(
-                container=container,
-                status="STARTED",
-                envs=envs,
-                command=command,
-            )
-            client.close()
+                ContainerHistoryModel.objects.create(
+                    container=container,
+                    status="FINISHED",
+                    envs=envs,
+                    command=command,
+                )
+                client.close()
+                return Response(
+                    {"message": "Container Stoped successfully"},
+                    status=status.HTTP_200_OK,
+                )
+        except Exception as e:
             return Response(
-                {"message": "Container started successfully"},
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"message": "Container is not in a stopped state"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     @extend_schema(
@@ -131,11 +149,19 @@ class DockerContainerViewSet(viewsets.ModelViewSet):
                 prev_container_id = instance.container_id
                 instance.container_id = new_container.id
                 container.remove()
+                if not instance.command.startswith("docker"):
+                    command = serializer.create_command_for_docker(data)
+                    instance.command = command
 
                 instance.save()
+
                 DockerContainerModel.objects.filter(
                     container_id=prev_container_id
                 ).delete()
+
+                historys = ContainerHistoryModel.objects.filter(
+                    container__container_id=None
+                ).update(container=instance)
 
                 client.close()
                 ContainerHistoryModel.objects.create(
@@ -159,13 +185,22 @@ class DockerContainerViewSet(viewsets.ModelViewSet):
         request=None, responses={status.HTTP_204_NO_CONTENT: "No Content"}
     )
     def destroy(self, request, pk=None):
-        container = get_object_or_404(self.queryset, pk=pk)
-        client = docker.from_env()
-        client.containers.get(container.container_id).remove(force=True)
-        container.delete()
-        client.close()
+        try:
+            container = get_object_or_404(self.queryset, pk=pk)
+            client = docker.from_env()
+            client.containers.get(container.name).remove(force=True)
+            container.delete()
+            client.close()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        finally:
+            ContainerHistoryModel.objects.filter(
+                container__isnull=True
+            ).delete()
 
 
 class ContainerHistoryViewSet(viewsets.ReadOnlyModelViewSet):

@@ -19,7 +19,7 @@ class ContainerHistoryModel(models.Model):
         ("CREATED", "created"),
     )
     container = models.ForeignKey(
-        "DockerContainerModel", on_delete=models.DO_NOTHING
+        "DockerContainerModel", null=True, on_delete=models.SET_NULL
     )
     envs = models.JSONField()
     command = models.CharField(max_length=300)
