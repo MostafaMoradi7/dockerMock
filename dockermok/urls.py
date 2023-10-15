@@ -4,9 +4,7 @@ from .views import (
     ContainerDetailView,
     ContainerCreateView,
     ContainerListView,
-    ContainerStopView,
     ContainerStartView,
-    ContainerLogsView,
     ContainerHistoryRetrieveView,
 )
 
@@ -24,18 +22,8 @@ urlpatterns = [
         name="container-detail",
     ),
     path(
-        "apps/<str:container_id>/stop/",
-        ContainerStopView.as_view(),
-        name="container-stop",
-    ),
-    path(
         "apps/<str:container_id>/start/",
         ContainerStartView.as_view(),
         name="container-start",
-    ),
-    path(
-        "apps/<str:container_id>/logs/",
-        ContainerLogsView.as_view(),
-        name="container-logs",
     ),
 ]
