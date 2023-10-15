@@ -49,9 +49,7 @@ class ContainerCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema(
-    responses={status.HTTP_200_OK: DockerContainerSerializer(many=True)}
-)
+@extend_schema(responses={status.HTTP_200_OK: DockerContainerSerializer(many=True)})
 class ContainerListView(APIView):
     def get(self, request, format=None):
         containers = DockerContainerModel.objects.all()
@@ -59,15 +57,11 @@ class ContainerListView(APIView):
         return Response(serializer.data)
 
 
-@extend_schema(
-    request=None, responses={status.HTTP_200_OK: DockerContainerSerializer}
-)
+@extend_schema(request=None, responses={status.HTTP_200_OK: DockerContainerSerializer})
 class ContainerDetailView(APIView):
     def get(self, request, container_id, format=None):
         try:
-            container = DockerContainerModel.objects.get(
-                container_id=container_id
-            )
+            container = DockerContainerModel.objects.get(container_id=container_id)
             serializer = DockerContainerSerializer(container)
             return Response(serializer.data)
         except DockerContainerModel.DoesNotExist:
@@ -78,9 +72,7 @@ class ContainerDetailView(APIView):
 
     def delete(self, request, container_id, format=None):
         try:
-            container = DockerContainerModel.objects.get(
-                container_id=container_id
-            )
+            container = DockerContainerModel.objects.get(container_id=container_id)
             client = docker.from_env()
             client.containers.get(container.container_id).remove(force=True)
             container.delete()
@@ -101,64 +93,15 @@ class ContainerDetailView(APIView):
         status.HTTP_400_BAD_REQUEST: MessageSerializer,
     },
 )
-class ContainerStopView(APIView):
-    def patch(self, request, container_id, format=None):
-        try:
-            container = DockerContainerModel.objects.get(
-                container_id=container_id
-            )
-            client = docker.from_env()
-            container_obj = client.containers.get(container.container_id)
-
-            if container_obj.status == "running":
-                envs = container_obj.attrs["Config"]["Env"]
-                command = container_obj.attrs["Config"]["Cmd"]
-
-                container_obj.stop()
-
-                ContainerHistoryModel.objects.create(
-                    container=container,
-                    status="FINISHED",
-                    envs=envs,
-                    command=command,
-                )
-                client.close()
-
-                return Response(
-                    {"message": "Container stopped successfully"},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(
-                    {"message": "Container is not running"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        except DockerContainerModel.DoesNotExist:
-            return Response(
-                {"error": "Container not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-
-@extend_schema(
-    request=None,
-    responses={
-        status.HTTP_200_OK: MessageSerializer,
-        status.HTTP_400_BAD_REQUEST: MessageSerializer,
-    },
-)
 class ContainerStartView(APIView):
     def patch(self, request, container_id, format=None):
         try:
-            container = DockerContainerModel.objects.get(
-                container_id=container_id
-            )
+            container = DockerContainerModel.objects.get(container_id=container_id)
             client = docker.from_env()
             container_obj = client.containers.get(container.container_id)
 
             if container_obj.status != "running":
                 container_obj.start()
-
                 envs = container_obj.attrs["Config"]["Env"]
                 command = container_obj.attrs["Config"]["Cmd"]
 
@@ -191,37 +134,3 @@ class ContainerStartView(APIView):
 class ContainerHistoryRetrieveView(ReadOnlyModelViewSet):
     queryset = ContainerHistoryModel.objects.all()
     serializer_class = ContainerHistorySerializer
-
-
-@extend_schema(
-    request=None,
-    responses={status.HTTP_200_OK: MessageSerializer},
-)
-class ContainerLogsView(APIView):
-    def get(self, request, container_id, format=None):
-        try:
-            container = DockerContainerModel.objects.get(
-                container_id=container_id
-            )
-            client = docker.from_env()
-            container_obj = client.containers.get(container.container_id)
-
-            logs = container_obj.logs().decode("utf-8")
-
-            # You can modify the response format as needed
-            response_data = {
-                "message": logs,
-            }
-
-            client.close()
-            return Response(response_data, status=status.HTTP_200_OK)
-        except DockerContainerModel.DoesNotExist:
-            return Response(
-                {"error": "Container not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        except Exception as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
