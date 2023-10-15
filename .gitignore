@@ -281,4 +281,3 @@ pip-selfcheck.json
 pyproject.toml 
 .flake8
 .vscode
-migrations
