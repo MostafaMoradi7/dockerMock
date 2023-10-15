@@ -76,10 +76,8 @@ class DockerContainerViewSet(viewsets.ModelViewSet):
         container = get_object_or_404(self.queryset, pk=pk)
         client = docker.from_env()
         container_obj = client.containers.get(container.container_id)
-        print("---------------------------------------------------")
         try:
             if container_obj.status != "running":
-                print("I am NOT running")
                 container_obj.start()
                 envs = container_obj.attrs["Config"]["Env"]
                 command = container_obj.attrs["Config"]["Cmd"]
@@ -96,7 +94,6 @@ class DockerContainerViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_200_OK,
                 )
             else:
-                print("I am Running!")
                 container_obj.stop()
                 envs = container_obj.attrs["Config"]["Env"]
                 command = container_obj.attrs["Config"]["Cmd"]
