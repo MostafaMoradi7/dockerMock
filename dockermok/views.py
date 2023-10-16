@@ -189,15 +189,15 @@ class DockerContainerViewSet(viewsets.ModelViewSet):
             container.delete()
             client.close()
 
+            ContainerHistoryModel.objects.filter(
+                container__isnull=True
+            ).delete()
+
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        finally:
-            ContainerHistoryModel.objects.filter(
-                container__isnull=True
-            ).delete()
 
 
 class ContainerHistoryViewSet(viewsets.ReadOnlyModelViewSet):
